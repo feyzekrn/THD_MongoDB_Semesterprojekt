@@ -36,7 +36,7 @@ Important relationships:
 - One product can have stock quantities in multiple stores.
 
 ## Relational ER Diagram
-[Relational ER Diagram](docs/er-diagram_sql.png)
+[Relational ER Diagram](docs/er_diagram_sql.png)
 
 ## Project Structure
 
