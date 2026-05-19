@@ -210,24 +210,29 @@ This creates a document-based MongoDB model that supports typical queries withou
 ```text
 semesterprojekt_ekren/
 ├── code/
-│   ├── scripts/
-│   │   ├── import_data.py
-│   │   └── requirements.txt
+│   ├── queries
+│   │   ├── mongodb
+│   │   │   └── queries.mongodb
+│   │   │
+│   │   └── sql_legacydata
+│   │       ├── db_relation_setup.sql
+│   │       └── db_setup.sql
 │   │
-│   └── queries/
-│       └── queries.mongodb
+│   └── scripts/
+│       ├── import_data.py
+│       └── requirements.txt
 │
 ├── data/
 │   └── kaggle_tables/
-│       ├── customers.csv
-│       ├── orders.csv
-│       ├── order_items.csv
-│       ├── products.csv
-│       ├── categories.csv
 │       ├── brands.csv
-│       ├── stores.csv
+│       ├── categories.csv
+│       ├── customers.csv
+│       ├── order_items.csv
+│       ├── orders.csv
+│       ├── products.csv
+│       ├── stocks.csv
 │       ├── staffs.csv
-│       └── stocks.csv
+│       └── stores.csv
 │
 ├── docs/
 │   └── er-diagram_sql.png
