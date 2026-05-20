@@ -1,0 +1,25 @@
+//--- Top-N Queries ---
+// Top 10 expensive prices
+
+// Top 5 Customers with the most orders
+
+// Top 10 most sold products
+
+// Top 5 Sellers
+
+//--- Queries of Relations between different Entities---
+// All orders of one single Customer x
+
+// All products of the brand x
+
+// All Orders where product x was sold
+
+//--- Aggregation and combination of data ---
+// Revenue made by each store
+
+// Average oder value per store
+
+// Amount of order by customer
+
+// Sold units per product
+

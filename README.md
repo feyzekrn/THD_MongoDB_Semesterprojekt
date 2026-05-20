@@ -74,13 +74,10 @@ Example structure:
 ```json
 {
   "order_id": 1,
-  "customer_id": 259,
   "order_status": 4,
   "order_date": "2016-01-01",
   "required_date": "2016-01-03",
   "shipped_date": "2016-01-03",
-  "store_id": 1,
-  "staff_id": 2,
   "customer": {
     "customer_id": 259,
     "first_name": "Example",
@@ -114,19 +111,23 @@ Example structure:
   },
   "items": [
     {
-      "order_id": 1,
       "item_id": 1,
-      "product_id": 20,
       "quantity": 1,
       "list_price": 599.99,
       "discount": 0.2,
       "product": {
         "product_id": 20,
         "product_name": "Example Product",
-        "brand_id": 9,
-        "category_id": 6,
         "model_year": 2016,
-        "list_price": 599.99
+        "list_price": 599.99,
+        "brand": {
+          "brand_id": 9,
+          "brand_name": "Example Brand"
+        },
+        "category": {
+          "category_id": 6,
+          "category_name": "Example Category"
+        }
       }
     }
   ]
@@ -150,8 +151,6 @@ Example structure:
 {
   "product_id": 1,
   "product_name": "Example Product",
-  "brand_id": 9,
-  "category_id": 6,
   "model_year": 2016,
   "list_price": 379.99,
   "brand": {
@@ -165,7 +164,6 @@ Example structure:
   "stocks": [
     {
       "store_id": 1,
-      "product_id": 1,
       "quantity": 27
     }
   ]
@@ -174,23 +172,38 @@ Example structure:
 
 ### Index Strategy
 
-Indexes were created for fields that are frequently used in typical query patterns.  
-The `product_id` and `order_id` fields are indexed uniquely because they represent the original primary keys.
+Indexes were created based on the expected query patterns of the MongoDB model, not simply on every available field.
 
-Additional indexes support relationship-based queries, Top-N queries and aggregation queries:
+The `product_id` and `order_id` fields are indexed uniquely because they represent the original primary keys from the relational SQL model.
 
-- products by brand
-- products by category
-- products by store stock
-- orders by customer
-- orders by store
-- orders by staff
-- orders by status
-- orders by date
-- orders containing a specific product
+The selected indexes support the planned query types of the project:
 
-Compound indexes were added for common combined filters, such as orders per store by date and orders per customer by date.
+- Top-N queries, such as the most expensive products
+- Relationship queries, such as products of a specific brand or orders of a specific customer
+- Aggregation queries, such as revenue per store, orders per customer, and sold units per product
+- Queries on embedded documents and arrays, such as `customer.customer_id`, `store.store_id`, and `items.product_id`
 
+The following index strategy is used:
+
+- `products.product_id` as a unique index for direct product lookup
+- `products.brand.brand_id` for filtering products by brand
+- `products.category.category_id` for filtering products by category
+- `products.list_price` for Top-N price queries
+
+
+- `orders.order_id` as a unique index for direct order lookup
+- `orders.customer.customer_id` for customer-based order queries
+- `orders.store.store_id` for store-based aggregations
+- `orders.staff.staff_id` for staff/seller-related queries
+- `orders.items.product_id` for finding orders that contain a specific product
+
+Additionally, compound indexes are used for common combined filters, such as:
+
+- orders of a customer sorted or filtered by date
+- orders of a store sorted or filtered by date
+- orders by status and date
+
+This keeps the index strategy aligned with realistic query patterns while avoiding unnecessary indexes on fields that are not used in the project queries.
 ## Data Transformation
 
 The relational tables are not stored as separate 1:1 MongoDB collections.
@@ -290,16 +303,28 @@ The script reads the CSV files from `data/kaggle_tables/`, transforms the relati
 
 The MongoDB queries will be stored later in:
 
-```text
-code/queries/queries.mongodb
-```
+`code/queries/queries.mongodb`
 
 Planned queries:
 
-1. Show orders with embedded order items
-2. Show the top 10 orders by total value
-3. Calculate revenue per store
-4. Count sold products per category
-5. Show products with stock quantities per store
+### Top-N Queries
+
+1. Show the top 10 most expensive products
+2. Show the top 5 customers with the most orders
+3. Show the top 10 most sold products
+4. Show the top 5 staff members/sellers by handled orders or revenue
+
+### Relationship Queries
+
+1. Show all orders of a specific customer
+2. Show all products of a specific brand
+3. Show all orders where a specific product was sold
+
+### Aggregation and Summary Queries
+
+1. Calculate the revenue made by each store
+2. Calculate the average order value per store
+3. Count the amount of orders per customer
+4. Calculate the sold units per product
 
 The queries can be executed directly in MongoDB Compass or `mongosh`.
