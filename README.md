@@ -39,6 +39,7 @@ Important relationships:
 - One product can have stock quantities in multiple stores.
 
 ## Relational ER Diagram
+
 <img src="docs/er_diagram_sql.png" alt="Relational ER Diagram" width="700">
 
 <hr>
@@ -54,6 +55,11 @@ Collections:
 - orders
 - products
 ```
+
+### MongoDB Document Model Diagram
+
+<img src="docs/er_diagram_mongodb.png" alt="MongoDB Document Model Diagram" width="700">
+
 
 ### Collection `orders`
 
