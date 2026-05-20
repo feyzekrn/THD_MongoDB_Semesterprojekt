@@ -57,7 +57,6 @@ Collections:
 
 ### Collection `orders`
 
-
 The `orders` collection is built from:
 
 - `orders.csv`
@@ -65,9 +64,10 @@ The `orders` collection is built from:
 - `customers.csv`
 - `stores.csv`
 - `staffs.csv`
-- `products.csv`
 
-Each order document contains all original columns from the `orders` table. The related customer, store, and staff records are embedded as full nested documents. The related order items are embedded as an array. Each order item preserves all original columns from the `order_items` table and additionally embeds the corresponding full product record.
+Each order document contains the original order information from the `orders` table. Foreign key fields such as `customer_id`, `store_id`, and `staff_id` are not duplicated on the root level. Instead, they are moved into the embedded `customer`, `store`, and `staff` documents.
+
+The related order items are embedded as an array. Each order item preserves the relevant columns from `order_items.csv`. The `order_id` is not duplicated inside each item because it is already represented by the parent order document. The `product_id` remains inside each item as a reference to the `products` collection.
 
 Example structure:
 
@@ -112,27 +112,22 @@ Example structure:
   "items": [
     {
       "item_id": 1,
+      "product_id": 20,
       "quantity": 1,
       "list_price": 599.99,
-      "discount": 0.2,
-      "product": {
-        "product_id": 20,
-        "product_name": "Example Product",
-        "model_year": 2016,
-        "list_price": 599.99,
-        "brand": {
-          "brand_id": 9,
-          "brand_name": "Example Brand"
-        },
-        "category": {
-          "category_id": 6,
-          "category_name": "Example Category"
-        }
-      }
+      "discount": 0.2
     }
   ]
 }
 ```
+
+The relationship between orders and products is therefore modeled as a reference:
+
+```text
+orders.items.product_id -> products.product_id
+```
+
+This avoids duplicating complete product data inside every order while still embedding the order items directly into the order document.
 
 ### Collection `products`
 
@@ -143,7 +138,9 @@ The `products` collection is built from:
 - `categories.csv`
 - `stocks.csv`
 
-Each product document contains all original columns from the `products` table. Additionally, the related brand and category rows are embedded as full nested documents. Stock rows are embedded as an array.
+Each product document contains the original product information from the `products` table. Foreign key fields such as `brand_id` and `category_id` are not duplicated on the root level. Instead, they are moved into the embedded `brand` and `category` documents.
+
+Stock rows are embedded as an array. The `product_id` is not duplicated inside each stock entry because it is already represented by the parent product document.
 
 Example structure:
 
